@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Be My Valentine 💖</title>
 
 <style>
@@ -23,13 +24,14 @@
         border-radius: 20px;
         box-shadow: 0 20px 40px rgba(0,0,0,0.2);
         max-width: 360px;
+        width: 90vw;
         position: relative;
         z-index: 2;
     }
 
     img {
-        width: 150px;
-        height: 150px;
+        width: 170px;
+        height: 170px;
         border-radius: 50%;
         object-fit: cover;
         border: 4px solid #ff4d6d;
@@ -39,23 +41,25 @@
     h1 {
         color: #b0003a;
         margin-bottom: 8px;
+        font-size: 24px;
     }
 
     #hint {
-        font-size: 14px;
+        font-size: 16px;
         color: #777;
         margin-bottom: 15px;
-        min-height: 20px;
+        min-height: 22px;
     }
 
     button {
-        padding: 15px 30px;
-        font-size: 18px;
+        padding: 18px 36px;
+        font-size: 20px;
         border: none;
-        border-radius: 10px;
+        border-radius: 12px;
         cursor: pointer;
         margin: 10px;
         transition: all 0.3s ease;
+        touch-action: manipulation;
     }
 
     #yesBtn {
@@ -63,7 +67,6 @@
         color: white;
         opacity: 0.6;
         cursor: not-allowed;
-        max-width: 90vw;
     }
 
     #yesBtn.enabled {
@@ -82,6 +85,7 @@
         font-size: 20px;
         animation: float 5s linear infinite;
         opacity: 0.8;
+        pointer-events: none;
     }
 
     @keyframes float {
@@ -94,7 +98,7 @@
 <body>
 
 <div class="card">
-    <!-- 👉 Replace anime.jpg with your image -->
+    <!-- Image file must be in same folder -->
     <img src="./anime.jpg" alt="Cute Anime Valentine">
 
     <h1>Will you be my Valentine? 💖</h1>
@@ -104,7 +108,7 @@
     <button id="noBtn">NO 🙄</button>
 
     <br>
-    <button onclick="location.reload()" style="font-size:12px;opacity:0.6;">
+    <button onclick="location.reload()" style="font-size:13px;opacity:0.6;">
         Reset 😅
     </button>
 </div>
@@ -113,6 +117,8 @@
     const yesBtn = document.getElementById("yesBtn");
     const noBtn = document.getElementById("noBtn");
     const hint = document.getElementById("hint");
+
+    const isMobile = window.matchMedia("(pointer: coarse)").matches;
 
     let noClicks = 0;
     let yesLocked = true;
@@ -145,6 +151,7 @@
         emoji.style.fontSize = "22px";
         emoji.style.opacity = "0.8";
         emoji.style.transition = "all 1s ease";
+        emoji.style.pointerEvents = "none";
         document.body.appendChild(emoji);
 
         setTimeout(() => {
@@ -155,8 +162,8 @@
         setTimeout(() => emoji.remove(), 1000);
     }
 
-    // 😈 YES runs away while locked
-    yesBtn.addEventListener("mouseover", () => {
+    // 😈 YES runs away when locked
+    function moveYes() {
         if (!yesLocked) return;
 
         hint.innerText = "Not yet 😏 Try the other option...";
@@ -170,10 +177,21 @@
 
         yesBtn.style.left = x + "px";
         yesBtn.style.top = y + "px";
-    });
+    }
 
-    // 🏃 NO button behavior
-    function moveNoButton() {
+    yesBtn.addEventListener("mouseover", moveYes);
+
+    if (isMobile) {
+        yesBtn.addEventListener("click", (e) => {
+            if (yesLocked) {
+                e.preventDefault();
+                moveYes();
+            }
+        });
+    }
+
+    // 🏃 NO button logic
+    function moveNo() {
         noClicks++;
 
         const w = noBtn.offsetWidth;
@@ -184,7 +202,7 @@
 
         noBtn.style.left = x + "px";
         noBtn.style.top = y + "px";
-        noBtn.style.transform = `scale(${Math.max(0.2, 1 - noClicks * 0.15)})`;
+        noBtn.style.transform = `scale(${Math.max(0.25, 1 - noClicks * 0.15)})`;
 
         spawnSadEmoji(x + w / 2, y + h / 2);
         hint.innerText = messages[Math.min(noClicks - 1, messages.length - 1)];
@@ -202,13 +220,13 @@
         }
     }
 
-    noBtn.addEventListener("mouseover", moveNoButton);
-    noBtn.addEventListener("click", moveNoButton);
+    noBtn.addEventListener("mouseover", moveNo);
+    noBtn.addEventListener("click", moveNo);
 
-    // 💖 YES clicked
+    // 💖 YES accepted
     yesBtn.addEventListener("click", () => {
         document.body.innerHTML = `
-            <h1 style="color:#b0003a">
+            <h1 style="color:#b0003a; font-size:28px;">
                 YAY!!! 💘💘💘<br>
                 Best choice ever 😘
             </h1>
@@ -218,4 +236,3 @@
 
 </body>
 </html>
-
